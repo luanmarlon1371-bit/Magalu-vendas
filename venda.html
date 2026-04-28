@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Pré-Venda · Magalu</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --blue: #0e1f5b; --blue2: #1a3080;
+    --yellow: #FFE000; --orange: #ff6b00;
+    --bg: #f0f2f8; --white: #ffffff;
+    --text: #0f172a; --muted: #64748b; --border: #e2e8f0;
+    --success: #16a34a; --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+
+  .hero { width: 100%; background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 60%, #2a4fa8 100%); padding: 36px 24px 80px; text-align: center; position: relative; overflow: hidden; }
+  .hero::before { content: ''; position: absolute; top: -60px; right: -60px; width: 220px; height: 220px; background: rgba(255,224,0,0.08); border-radius: 50%; }
+  .hero-logo { display: inline-flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+  .hero-icon { width: 42px; height: 42px; background: var(--yellow); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; box-shadow: 0 4px 16px rgba(255,224,0,0.3); }
+  .hero-brand { font-weight: 800; font-size: 1.15rem; color: #fff; }
+  .hero-brand small { display: block; font-size: 0.65rem; font-weight: 500; color: var(--yellow); letter-spacing: 2px; text-transform: uppercase; }
+  .hero h1 { font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1.2; margin-bottom: 8px; }
+  .hero h1 span { color: var(--yellow); }
+  .hero p { color: rgba(255,255,255,0.65); font-size: 0.9rem; max-width: 320px; margin: 0 auto; }
+
+  .card { background: var(--white); border-radius: var(--radius); box-shadow: 0 8px 40px rgba(14,31,91,0.12); width: 100%; max-width: 480px; margin: -44px auto 32px; padding: 32px 28px; position: relative; z-index: 2; }
+  .card-title { font-size: 1rem; font-weight: 800; color: var(--blue); margin-bottom: 22px; display: flex; align-items: center; gap: 8px; }
+
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 0.72rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 7px; }
+  .field label .req { color: var(--orange); margin-left: 2px; }
+  .field input, .field select { width: 100%; padding: 13px 16px; border: 2px solid var(--border); border-radius: 12px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.92rem; color: var(--text); background: #f8fafc; transition: all 0.2s; outline: none; -webkit-appearance: none; }
+  .field input:focus, .field select:focus { border-color: var(--blue); background: #fff; box-shadow: 0 0 0 4px rgba(14,31,91,0.07); }
+  .field input.error { border-color: #ef4444; background: #fff5f5; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .date-hint { font-size: 0.72rem; color: var(--muted); margin-top: 5px; }
+
+  /* Vendedor badge */
+  .vendedor-badge { display: flex; align-items: center; gap: 10px; background: rgba(14,31,91,0.06); border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; }
+  .vendedor-avatar { width: 38px; height: 38px; background: var(--blue); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; flex-shrink: 0; }
+  .vendedor-info { flex: 1; }
+  .vendedor-info span { display: block; font-size: 0.68rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; }
+  .vendedor-info strong { font-size: 0.95rem; color: var(--blue); font-weight: 800; }
+  .btn-logout { background: none; border: 1.5px solid var(--border); border-radius: 8px; padding: 6px 10px; font-size: 0.7rem; font-weight: 700; color: var(--muted); cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif; transition: all 0.15s; }
+  .btn-logout:hover { border-color: #ef4444; color: #ef4444; }
+
+  /* Upload */
+  .upload-area { border: 2px dashed var(--border); border-radius: 12px; padding: 20px 16px; text-align: center; cursor: pointer; transition: all 0.2s; background: #f8fafc; position: relative; }
+  .upload-area:hover, .upload-area.dragover { border-color: var(--blue); background: rgba(14,31,91,0.04); }
+  .upload-area.has-file { border-color: var(--success); background: rgba(22,163,74,0.04); }
+  .upload-area.error { border-color: #ef4444; background: #fff5f5; }
+  .upload-area input[type="file"] { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0; cursor: pointer; border: none; background: none; padding: 0; }
+  .upload-icon { font-size: 1.8rem; margin-bottom: 8px; }
+  .upload-text { font-size: 0.82rem; font-weight: 700; color: var(--blue); margin-bottom: 3px; }
+  .upload-hint { font-size: 0.72rem; color: var(--muted); }
+  .upload-preview { display: none; align-items: center; gap: 10px; padding: 10px 14px; background: rgba(22,163,74,0.08); border-radius: 10px; margin-top: 10px; text-align: left; }
+  .upload-preview.show { display: flex; }
+  .preview-thumb { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; border: 2px solid rgba(22,163,74,0.3); flex-shrink: 0; }
+  .preview-icon { width: 40px; height: 40px; border-radius: 8px; background: rgba(22,163,74,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+  .preview-info { flex: 1; min-width: 0; }
+  .preview-name { font-size: 0.78rem; font-weight: 700; color: var(--success); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .preview-size { font-size: 0.68rem; color: var(--muted); }
+  .preview-remove { background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); padding: 4px; flex-shrink: 0; line-height: 1; }
+  .preview-remove:hover { color: #ef4444; }
+  .upload-progress { display: none; margin-top: 10px; }
+  .upload-progress.show { display: block; }
+  .progress-bar-wrap { height: 6px; background: var(--border); border-radius: 99px; overflow: hidden; margin-bottom: 4px; }
+  .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #2a4fa8); border-radius: 99px; transition: width 0.2s; width: 0%; }
+  .progress-label { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+  .divider { height: 1px; background: var(--border); margin: 20px 0; position: relative; }
+  .divider-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); background: var(--white); padding: 0 10px; font-size: 0.7rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+
+  .btn-submit { width: 100%; padding: 16px; background: linear-gradient(135deg, var(--blue) 0%, var(--blue2) 100%); color: #fff; border: none; border-radius: 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s; margin-top: 8px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 20px rgba(14,31,91,0.25); }
+  .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(14,31,91,0.32); }
+  .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+  .spinner { width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .success-screen { display: none; text-align: center; padding: 12px 0; }
+  .success-icon { width: 72px; height: 72px; background: linear-gradient(135deg, #16a34a, #22c55e); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 18px; box-shadow: 0 8px 24px rgba(22,163,74,0.3); animation: popIn 0.5s cubic-bezier(.34,1.56,.64,1); }
+  @keyframes popIn { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .success-title { font-size: 1.35rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+  .success-sub { color: var(--muted); font-size: 0.88rem; line-height: 1.5; margin-bottom: 24px; }
+  .summary-box { background: #f8fafc; border-radius: 12px; padding: 16px; text-align: left; margin-bottom: 20px; }
+  .summary-row { display: flex; justify-content: space-between; font-size: 0.82rem; padding: 5px 0; border-bottom: 1px solid var(--border); }
+  .summary-row:last-child { border: none; }
+  .summary-row span:first-child { color: var(--muted); }
+  .summary-row span:last-child { font-weight: 700; color: var(--text); max-width: 60%; text-align: right; word-break: break-all; }
+  .comprovante-link { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; font-size: 0.82rem; font-weight: 700; color: var(--blue); text-decoration: none; background: rgba(14,31,91,0.07); padding: 8px 14px; border-radius: 8px; }
+  .btn-new { width: 100%; padding: 14px; background: var(--yellow); color: var(--blue); border: none; border-radius: 14px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.92rem; font-weight: 800; cursor: pointer; transition: all 0.18s; }
+  .btn-new:hover { background: #e6c900; transform: translateY(-1px); }
+
+  .error-box { background: #fee2e2; border: 1px solid #fecaca; border-radius: 10px; padding: 12px 16px; margin-bottom: 16px; font-size: 0.84rem; color: #dc2626; font-weight: 600; display: none; }
+
+  /* Auth */
+  .auth-tabs { display: flex; background: #f0f2f8; border-radius: 12px; padding: 4px; margin-bottom: 24px; gap: 4px; }
+  .auth-tab { flex: 1; padding: 10px; border: none; background: none; border-radius: 9px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.84rem; font-weight: 700; color: var(--muted); cursor: pointer; transition: all 0.18s; }
+  .auth-tab.active { background: var(--white); color: var(--blue); box-shadow: 0 2px 8px rgba(14,31,91,0.1); }
+  .auth-panel { display: none; }
+  .auth-panel.active { display: block; }
+  .password-wrap { position: relative; }
+  .password-wrap input { padding-right: 46px; }
+  .toggle-pw { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1rem; color: var(--muted); padding: 4px; line-height: 1; }
+
+  .footer { padding: 20px; text-align: center; color: var(--muted); font-size: 0.75rem; }
+  @keyframes shake { 0%,100%{transform:translateX(0);}20%,60%{transform:translateX(-6px);}40%,80%{transform:translateX(6px);} }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-logo">
+    <div class="hero-icon">🛍️</div>
+    <div class="hero-brand">Magalu <small>Mobile Vendas</small></div>
+  </div>
+  <h1 id="hero-title">Área do <span>Vendedor</span></h1>
+  <p id="hero-sub">Faça login ou crie sua conta para registrar pré-vendas</p>
+</div>
+
+<div class="card">
+
+  <!-- AUTH -->
+  <div id="auth-area">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-btn" onclick="switchAuth('login')">🔐 Entrar</button>
+      <button class="auth-tab" id="tab-reg-btn" onclick="switchAuth('register')">✨ Criar conta</button>
+    </div>
+    <div class="error-box" id="auth-error"></div>
+
+    <div class="auth-panel active" id="panel-login">
+      <div class="field">
+        <label>Usuário <span class="req">*</span></label>
+        <input type="text" id="login-user" placeholder="Seu usuário" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Senha <span class="req">*</span></label>
+        <div class="password-wrap">
+          <input type="password" id="login-pass" placeholder="Sua senha" autocomplete="current-password">
+          <button class="toggle-pw" onclick="togglePw('login-pass',this)" tabindex="-1">👁️</button>
+        </div>
+      </div>
+      <button class="btn-submit" id="btn-login" onclick="doLogin()">
+        <span id="login-text">🔐 Entrar</span>
+        <div class="spinner" id="login-spinner"></div>
+      </button>
+    </div>
+
+    <div class="auth-panel" id="panel-register">
+      <div class="field">
+        <label>Seu nome completo <span class="req">*</span></label>
+        <input type="text" id="reg-nome" placeholder="Ex: João Silva">
+      </div>
+      <div class="field">
+        <label>Usuário (para login) <span class="req">*</span></label>
+        <input type="text" id="reg-user" placeholder="Ex: joaosilva" autocomplete="username">
+      </div>
+      <div class="field">
+        <label>Senha <span class="req">*</span></label>
+        <div class="password-wrap">
+          <input type="password" id="reg-pass" placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+          <button class="toggle-pw" onclick="togglePw('reg-pass',this)" tabindex="-1">👁️</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Confirmar senha <span class="req">*</span></label>
+        <div class="password-wrap">
+          <input type="password" id="reg-pass2" placeholder="Repita a senha" autocomplete="new-password">
+          <button class="toggle-pw" onclick="togglePw('reg-pass2',this)" tabindex="-1">👁️</button>
+        </div>
+      </div>
+      <button class="btn-submit" id="btn-register" onclick="doRegister()">
+        <span id="reg-text">✨ Criar minha conta</span>
+        <div class="spinner" id="reg-spinner"></div>
+      </button>
+    </div>
+  </div>
+
+  <!-- FORMULÁRIO -->
+  <div id="form-area" style="display:none">
+    <div class="vendedor-badge">
+      <div class="vendedor-avatar">👤</div>
+      <div class="vendedor-info">
+        <span>Vendedor logado</span>
+        <strong id="badge-nome"></strong>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">Sair</button>
+    </div>
+
+    <div class="card-title">📋 Dados da Pré-Venda</div>
+    <div class="error-box" id="error-box">⚠️ Erro ao enviar. Verifique sua conexão e tente novamente.</div>
+
+    <div class="field">
+      <label>CPF do cliente <span class="req">*</span></label>
+      <input type="text" id="f-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)" inputmode="numeric">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Valor (R$) <span class="req">*</span></label>
+        <input type="number" id="f-valor" placeholder="0,00" step="0.01" inputmode="decimal">
+      </div>
+      <div class="field">
+        <label>Forma de pgto <span class="req">*</span></label>
+        <select id="f-pagamento">
+          <option value="">Selecione...</option>
+          <option>Cartão de Crédito</option>
+          <option>Cartão de Débito</option>
+          <option>Dinheiro</option>
+        </select>
+      </div>
+    </div>
+    <div class="divider"><span class="divider-label">Datas</span></div>
+    <div class="field-row">
+      <div class="field">
+        <label>Data do pagamento <span class="req">*</span></label>
+        <input type="date" id="f-data-pag">
+        <div class="date-hint">📅 Hoje ou anterior</div>
+      </div>
+      <div class="field">
+        <label>Data de lançamento <span class="req">*</span></label>
+        <input type="date" id="f-data-lanc">
+        <div class="date-hint">⏳ Data futura</div>
+      </div>
+    </div>
+    <div class="divider"><span class="divider-label">Produto</span></div>
+    <div class="field">
+      <label>Produto / Descrição</label>
+      <input type="text" id="f-produto" placeholder="Ex: TV 55'', Geladeira Brastemp...">
+    </div>
+    <div class="field">
+      <label>Observação</label>
+      <input type="text" id="f-obs" placeholder="Informação adicional...">
+    </div>
+    <div class="divider"><span class="divider-label">Comprovante</span></div>
+    <div class="field">
+      <label>Comprovante de pagamento <span class="req">*</span></label>
+      <div class="upload-area" id="upload-area">
+        <input type="file" id="f-comprovante" accept="image/*,.pdf" onchange="handleFileSelect(this)">
+        <div id="upload-placeholder">
+          <div class="upload-icon">📎</div>
+          <div class="upload-text">Toque para anexar comprovante</div>
+          <div class="upload-hint">Foto, print ou PDF · Máx. 10 MB</div>
+        </div>
+      </div>
+      <div class="upload-preview" id="upload-preview">
+        <div class="preview-icon" id="preview-icon">🖼️</div>
+        <img class="preview-thumb" id="preview-thumb" src="" alt="" style="display:none">
+        <div class="preview-info">
+          <div class="preview-name" id="preview-name"></div>
+          <div class="preview-size" id="preview-size"></div>
+        </div>
+        <button class="preview-remove" onclick="removeFile()" title="Remover">✕</button>
+      </div>
+      <div class="upload-progress" id="upload-progress">
+        <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
+        <div class="progress-label" id="progress-label">Enviando comprovante...</div>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="btn-submit" onclick="submitForm()">
+      <span id="btn-text">✅ Enviar Pré-Venda</span>
+      <div class="spinner" id="spinner"></div>
+    </button>
+  </div>
+
+  <!-- SUCESSO -->
+  <div class="success-screen" id="success-area">
+    <div class="success-icon">✅</div>
+    <div class="success-title">Pré-Venda Registrada!</div>
+    <div class="success-sub">Os dados foram enviados e já aparecem no sistema da equipe em tempo real.</div>
+    <div class="summary-box" id="summary-box"></div>
+    <button class="btn-new" onclick="resetForm()">➕ Registrar outra pré-venda</button>
+  </div>
+</div>
+
+<div class="footer">Magazine Luiza · Sistema Mobile Vendas</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const app = initializeApp({
+    apiKey: "AIzaSyBm6p7J1OiTNkZXrNTWKXd_yA6LO7kiEKc",
+    authDomain: "magalu-vendas.firebaseapp.com",
+    projectId: "magalu-vendas",
+    storageBucket: "magalu-vendas.firebasestorage.app",
+    messagingSenderId: "232408753289",
+    appId: "1:232408753289:web:49c08f906a8ba6b0f9b5a0"
+  });
+  const db = getFirestore(app);
+
+  let currentUser = null;
+  const saved = sessionStorage.getItem('magalu_user');
+  if (saved) { currentUser = JSON.parse(saved); showFormArea(); }
+
+  const today = new Date().toISOString().split('T')[0];
+
+  function initDates() {
+    document.getElementById('f-data-pag').value = today;
+    document.getElementById('f-data-lanc').value = '';
+    const t = new Date(); t.setDate(t.getDate()+1);
+    document.getElementById('f-data-lanc').min = t.toISOString().split('T')[0];
+  }
+
+  // ── Auth ──────────────────────────────────────────────────────
+  window.switchAuth = function(tab) {
+    ['login','register'].forEach(t => {
+      document.getElementById(`panel-${t}`).classList.toggle('active', t===tab);
+      document.getElementById(`tab-${t}-btn`).classList.toggle('active', t===tab);
+    });
+    document.getElementById('auth-error').style.display = 'none';
+  };
+
+  window.togglePw = function(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type==='password' ? 'text' : 'password';
+    btn.textContent = inp.type==='password' ? '👁️' : '🙈';
+  };
+
+  function authLoading(prefix, on) {
+    document.getElementById(`btn-${prefix}`).disabled = on;
+    document.getElementById(`${prefix}-spinner`).style.display = on ? 'block' : 'none';
+    document.getElementById(`${prefix}-text`).textContent = on
+      ? 'Aguarde...'
+      : (prefix==='login' ? '🔐 Entrar' : '✨ Criar minha conta');
+  }
+
+  function showAuthError(msg) {
+    const el = document.getElementById('auth-error');
+    el.textContent = msg; el.style.display = 'block';
+  }
+
+  // Hash simples (compatível com todos os browsers mobile)
+  function simpleHash(str) {
+    let h = 0;
+    for (let i = 0; i < str.length; i++) { h = Math.imul(31, h) + str.charCodeAt(i) | 0; }
+    return (h >>> 0).toString(16);
+  }
+
+  window.doRegister = async function() {
+    const nome  = document.getElementById('reg-nome').value.trim();
+    const user  = document.getElementById('reg-user').value.trim().toLowerCase().replace(/\s/g,'');
+    const pass  = document.getElementById('reg-pass').value;
+    const pass2 = document.getElementById('reg-pass2').value;
+    if (!nome||!user||!pass||!pass2) { showAuthError('⚠️ Preencha todos os campos.'); return; }
+    if (user.length < 3) { showAuthError('⚠️ Usuário deve ter ao menos 3 caracteres.'); return; }
+    if (pass.length < 6) { showAuthError('⚠️ Senha deve ter ao menos 6 caracteres.'); return; }
+    if (pass !== pass2) { showAuthError('⚠️ As senhas não coincidem.'); return; }
+    authLoading('register', true);
+    document.getElementById('auth-error').style.display = 'none';
+    try {
+      const snap = await getDocs(query(collection(db,'vendedores'), where('username','==',user)));
+      if (!snap.empty) { showAuthError('❌ Usuário já existe. Escolha outro.'); authLoading('register',false); return; }
+      await addDoc(collection(db,'vendedores'), { username:user, nomeCompleto:nome, senhaHash:simpleHash(pass), criadoEm:serverTimestamp() });
+      currentUser = { username:user, nomeCompleto:nome };
+      sessionStorage.setItem('magalu_user', JSON.stringify(currentUser));
+      showFormArea();
+    } catch(e) { showAuthError("❌ Erro: " + (e.message || "Tente novamente.")); authLoading("register",false); }
+  };
+
+
+  window.doLogin = async function() {
+    const user = document.getElementById('login-user').value.trim().toLowerCase();
+    const pass = document.getElementById('login-pass').value;
+    if (!user||!pass) { showAuthError('⚠️ Preencha usuário e senha.'); return; }
+    authLoading('login', true);
+    document.getElementById('auth-error').style.display = 'none';
+    try {
+      const snap = await getDocs(query(collection(db,'vendedores'), where('username','==',user), where('senhaHash','==',simpleHash(pass))));
+      if (snap.empty) { showAuthError('❌ Usuário ou senha incorretos.'); authLoading('login',false); return; }
+      const d = snap.docs[0].data();
+      currentUser = { username:d.username, nomeCompleto:d.nomeCompleto };
+      sessionStorage.setItem('magalu_user', JSON.stringify(currentUser));
+      showFormArea();
+    } catch(e) { console.error(e); showAuthError('❌ Erro ao fazer login. Verifique sua conexão.'); authLoading('login',false); }
+  };
+
+  window.doLogout = function() {
+    currentUser = null;
+    sessionStorage.removeItem('magalu_user');
+    document.getElementById('auth-area').style.display = 'block';
+    document.getElementById('form-area').style.display = 'none';
+    document.getElementById('success-area').style.display = 'none';
+    document.getElementById('hero-title').innerHTML = 'Área do <span>Vendedor</span>';
+    document.getElementById('hero-sub').textContent = 'Faça login ou crie sua conta para registrar pré-vendas';
+    document.getElementById('login-user').value = '';
+    document.getElementById('login-pass').value = '';
+    document.getElementById('auth-error').style.display = 'none';
+    switchAuth('login');
+  };
+
+  function showFormArea() {
+    document.getElementById('auth-area').style.display = 'none';
+    document.getElementById('form-area').style.display = 'block';
+    document.getElementById('badge-nome').textContent = currentUser.nomeCompleto;
+    const primeiro = currentUser.nomeCompleto.split(' ')[0];
+    document.getElementById('hero-title').innerHTML = `Olá, <span>${primeiro}!</span>`;
+    document.getElementById('hero-sub').textContent = 'Registre sua pré-venda abaixo';
+    initDates();
+  }
+
+  // ── File handling ─────────────────────────────────────────────
+  let selectedFile = null;
+
+  window.handleFileSelect = function(input) {
+    const file = input.files[0]; if (!file) return;
+    if (file.size > 10*1024*1024) { alert('O arquivo deve ter no máximo 10 MB.'); input.value=''; return; }
+    selectedFile = file;
+    document.getElementById('upload-area').classList.add('has-file');
+    document.getElementById('upload-area').classList.remove('error');
+    document.getElementById('preview-name').textContent = file.name;
+    document.getElementById('preview-size').textContent = formatBytes(file.size);
+    const thumb = document.getElementById('preview-thumb');
+    const icon  = document.getElementById('preview-icon');
+    if (file.type.startsWith('image/')) {
+      const r = new FileReader();
+      r.onload = e => { thumb.src=e.target.result; thumb.style.display='block'; icon.style.display='none'; };
+      r.readAsDataURL(file);
+    } else { thumb.style.display='none'; icon.style.display='flex'; icon.textContent='📄'; }
+    document.getElementById('upload-preview').classList.add('show');
+  };
+
+  window.removeFile = function() {
+    selectedFile = null;
+    document.getElementById('f-comprovante').value = '';
+    document.getElementById('upload-area').classList.remove('has-file','error');
+    document.getElementById('upload-preview').classList.remove('show');
+    document.getElementById('upload-progress').classList.remove('show');
+    document.getElementById('preview-thumb').style.display = 'none';
+    document.getElementById('preview-icon').style.display = 'flex';
+  };
+
+  const uploadArea = document.getElementById('upload-area');
+  uploadArea.addEventListener('dragover', e => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+  uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
+  uploadArea.addEventListener('drop', e => {
+    e.preventDefault(); uploadArea.classList.remove('dragover');
+    const f = e.dataTransfer.files[0];
+    if (f) { document.getElementById('f-comprovante').files = e.dataTransfer.files; window.handleFileSelect(document.getElementById('f-comprovante')); }
+  });
+
+  // ── Cloudinary ────────────────────────────────────────────────
+  function uploadComprovante(file, cpf) {
+    return new Promise((resolve, reject) => {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', 'nnvuwyly');
+      fd.append('folder', 'comprovantes');
+      fd.append('public_id', `${cpf.replace(/\D/g,'')}_${Date.now()}`);
+      document.getElementById('upload-progress').classList.add('show');
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', 'https://api.cloudinary.com/v1_1/dgxg08ryo/auto/upload');
+      xhr.upload.onprogress = e => {
+        if (e.lengthComputable) {
+          const p = Math.round(e.loaded/e.total*100);
+          document.getElementById('progress-bar').style.width = p+'%';
+          document.getElementById('progress-label').textContent = `Enviando comprovante... ${p}%`;
+        }
+      };
+      xhr.onload = () => {
+        if (xhr.status===200) { const r=JSON.parse(xhr.responseText); document.getElementById('progress-label').textContent='✅ Comprovante enviado!'; resolve({url:r.secure_url,path:r.public_id}); }
+        else reject(new Error('Erro no upload'));
+      };
+      xhr.onerror = () => reject(new Error('Falha na conexão'));
+      xhr.send(fd);
+    });
+  }
+
+  // ── Helpers ───────────────────────────────────────────────────
+  window.maskCPF = function(inp) {
+    let v = inp.value.replace(/\D/g,'').slice(0,11);
+    v = v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+    inp.value = v;
+  };
+  window.formatDate = s => { if(!s) return '—'; const [y,m,d]=s.split('-'); return `${d}/${m}/${y}`; };
+  function formatBytes(b) { if(b<1024) return b+' B'; if(b<1048576) return (b/1024).toFixed(1)+' KB'; return (b/1048576).toFixed(1)+' MB'; }
+
+  // ── Submit ────────────────────────────────────────────────────
+  window.submitForm = async function() {
+    if (!currentUser) { doLogout(); return; }
+    const cpf      = document.getElementById('f-cpf').value.trim();
+    const valor    = parseFloat(document.getElementById('f-valor').value);
+    const pagamento= document.getElementById('f-pagamento').value;
+    const dataPag  = document.getElementById('f-data-pag').value;
+    const dataLanc = document.getElementById('f-data-lanc').value;
+    const produto  = document.getElementById('f-produto').value.trim();
+    const obs      = document.getElementById('f-obs').value.trim();
+
+    let ok = true;
+    [['f-cpf',cpf.length<14],['f-valor',isNaN(valor)||valor<=0],['f-pagamento',!pagamento],['f-data-pag',!dataPag],['f-data-lanc',!dataLanc]]
+      .forEach(([id,err]) => { document.getElementById(id).classList.toggle('error',err); if(err) ok=false; });
+    if (!selectedFile) { document.getElementById('upload-area').classList.add('error'); ok=false; }
+    else document.getElementById('upload-area').classList.remove('error');
+    if (!ok) { document.querySelector('.btn-submit').style.animation='shake 0.4s ease'; setTimeout(()=>document.querySelector('.btn-submit').style.animation='',400); return; }
+    if (dataLanc<=dataPag) { document.getElementById('f-data-lanc').classList.add('error'); alert('A data de lançamento deve ser após o pagamento.'); return; }
+
+    document.getElementById('btn-text').textContent='Enviando...';
+    document.getElementById('spinner').style.display='block';
+    document.getElementById('btn-submit').disabled=true;
+    document.getElementById('error-box').style.display='none';
+
+    try {
+      const {url:comprovanteURL, path:comprovantePath} = await uploadComprovante(selectedFile, cpf);
+      await addDoc(collection(db,'presales'), {
+        vendedor: currentUser.nomeCompleto, username: currentUser.username,
+        cpf, valor, pagamento, dataPag, dataLanc, produto, obs,
+        status:'pendente', origem:'formulario-vendedor',
+        comprovanteURL, comprovantePath, comprovanteNome: selectedFile.name,
+        criadoEm: serverTimestamp()
+      });
+      document.getElementById('form-area').style.display='none';
+      document.getElementById('success-area').style.display='block';
+      document.getElementById('summary-box').innerHTML =
+        [['Vendedor',currentUser.nomeCompleto],['CPF',cpf],['Valor','R$ '+valor.toFixed(2)],
+         ['Pagamento',pagamento],['Pago em',formatDate(dataPag)],['Lançamento',formatDate(dataLanc)],['Produto',produto||'—']]
+        .map(([k,v])=>`<div class="summary-row"><span>${k}</span><span>${v}</span></div>`).join('')
+        + `<div style="text-align:center;margin-top:12px"><a class="comprovante-link" href="${comprovanteURL}" target="_blank">📎 Ver comprovante</a></div>`;
+    } catch(e) {
+      console.error(e);
+      document.getElementById('error-box').style.display='block';
+      document.getElementById('btn-text').textContent='✅ Enviar Pré-Venda';
+      document.getElementById('spinner').style.display='none';
+      document.getElementById('btn-submit').disabled=false;
+      document.getElementById('upload-progress').classList.remove('show');
+    }
+  };
+
+  window.resetForm = function() {
+    document.getElementById('form-area').style.display='block';
+    document.getElementById('success-area').style.display='none';
+    ['f-cpf','f-valor','f-pagamento','f-produto','f-obs'].forEach(id=>document.getElementById(id).value='');
+    initDates();
+    document.getElementById('btn-text').textContent='✅ Enviar Pré-Venda';
+    document.getElementById('spinner').style.display='none';
+    document.getElementById('btn-submit').disabled=false;
+    window.removeFile();
+  };
+
+  document.getElementById('login-pass').addEventListener('keydown', e => { if(e.key==='Enter') window.doLogin(); });
+  document.getElementById('reg-pass2').addEventListener('keydown', e => { if(e.key==='Enter') window.doRegister(); });
+</script>
+</body>
+</html>
